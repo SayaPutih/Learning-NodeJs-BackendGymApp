@@ -20,7 +20,7 @@ const CodeDisciplineModel = sequ.define(
     },
   },
   {
-    tableName : "CodeDisciplines",
+    tableName: "CodeDisciplines",
     timestamps: true,
   }
 );

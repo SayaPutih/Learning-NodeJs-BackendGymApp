@@ -1,5 +1,8 @@
 import express from "express";
 import ScheduleDisciplineModel from "../../models/routine/ScheduleDisciplineModel.js";
+import CodeDetailModel from "../../models/routine/CodeDetailModel.js";
+import CodeDisciplineModel from "../../models/routine/CodeDisciplineModel.js";
+
 //../../../models/routines/ScheduleDisciplineModel.js"
 const model = ScheduleDisciplineModel;
 
@@ -103,3 +106,59 @@ export const deleteSchedule = async (req, res) => {
     res.status(500).json(err.message);
   }
 };
+
+
+export const insertASchedule= async (req, res) => {
+  try {
+    const tempInserter = await ScheduleDisciplineModel.create(req.body);
+    res.status(200).json(tempInserter);
+  } catch (err) {
+    console.error(`Error Apa -> : ${err}`);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const insertAScheduleV2 = async (req, res) => {
+  try {
+    const tempInserter = {
+      ...req.body,
+      date: new Date(),
+    };
+    const inserted = await ScheduleDisciplineModel.create(tempInserter);
+    res.status(200).json(inserted);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+export const getFullScheduleDetails= async (req, res) => {
+  try {
+    const result = await ScheduleDisciplineModel.findAll({
+      attributes: ["date", ["DoaPagi", "Doa"], ["CuciPiring", "CcPiring"]],
+
+      include: [
+        {
+          model: CodeDetailModel,
+          as: "ListCodeDetails",
+          attributes: ["detail"],
+
+          include: [
+            {
+              model: CodeDisciplineModel,
+              as: "StackDetails",
+              attributes: ["stackName"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!result)
+      return res.status(404).json("Nothing in the Database Master Evan");
+    return res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

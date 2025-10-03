@@ -42,7 +42,7 @@ GymDayDisciplineModel.hasMany(GymWorkoutDisciplineModel, {
   foreignKey: "GymDayId",
   sourceKey: "id",
   as: "ListOfWorkouts",
-  onDelete: "CASCADE"
+  onDelete: "CASCADE",
 });
 GymWorkoutDisciplineModel.belongsTo(GymDayDisciplineModel, {
   foreignKey: "GymDayId",

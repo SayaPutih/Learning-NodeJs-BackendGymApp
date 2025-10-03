@@ -1,5 +1,8 @@
 import express from "express";
 import CodeDetailModel from "../../models/routine/CodeDetailModel.js";
+import ScheduleDisciplineModel from "../../models/routine/ScheduleDisciplineModel.js";
+import CodeDisciplineModel from "../../models/routine/CodeDisciplineModel.js";
+
 //import CodeDetailModel from "../../../models/routine/CodeDetailModel.js";
 //../../../models/routines/CodeDetailModel.js"
 const model = CodeDetailModel;
@@ -26,6 +29,37 @@ export const getCodeDetailsById = async (req, res) => {
     return res.status(200).json(tempFinder);
   } catch (err) {
     res.status(500).json(err.message);
+  }
+};
+
+export const insertACodeDetails= async (req, res) => {
+  try {
+    const tempInserter = req.body;
+
+    const tableExists = await ScheduleDisciplineModel.findByPk(
+      tempInserter.TableId
+    );
+    const codeStackExists = await CodeDisciplineModel.findByPk(
+      tempInserter.CodeId
+    );
+
+    if (tableExists == null)
+      return res
+        .status(404)
+        .json(`Nothing with table Id ${tempInserter.TableId} M Evan`);
+    if (codeStackExists == null)
+      return res
+        .status(404)
+        .json(`Nothing with Code Id ${tempInserter.CodeId} M Evan`);
+
+    const inserter = await CodeDetailModel.create(tempInserter);
+    res
+      .status(200)
+      .json(
+        `Created new Detail for ${codeStackExists.stackName} -> ${inserter.detail}`
+      );
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
