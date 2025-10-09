@@ -30,6 +30,11 @@ const GymDetailModel = sequ.define(
       allowNull: true,
       defaultValue: "-",
     },
+    workoutDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+      defaultValue: "2004-01-29",//Must Be Date
+    },
     TableId: {
       type: DataTypes.UUID,
       allowNull: false,

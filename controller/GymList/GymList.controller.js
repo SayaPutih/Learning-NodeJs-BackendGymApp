@@ -5,6 +5,26 @@ import GymDayDisciplineModel from "../../models/routine/GymDayDisciplineModel.js
 
 const model = GymDetailModel;
 
+export const getAllDaysWithWorkout = async(req,res)=>{
+  try{
+
+    const tempFinder = await GymDayDisciplineModel.findAll({
+      include : [
+        {
+          model : GymWorkoutDisciplineModel,
+          as : "ListOfWorkouts"
+        }
+      ]
+    });
+
+    if(!tempFinder || tempFinder === 0)return res.status(404).json("Master Evan Somthing wrong with Fetching all Days");
+    return res.status(200).json(tempFinder);
+
+  }catch(err){
+    return res.status(500).json(err.message);
+  }
+}
+
 export const getAllGymDetails = async(req,res)=>{
   try{
 

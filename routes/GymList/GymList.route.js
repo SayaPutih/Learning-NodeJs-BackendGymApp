@@ -1,4 +1,4 @@
-import { getAllGymList,getAllGymListWithDay,getAllGymDetails } from "../../controller/GymList/GymList.controller.js";
+import { getAllGymList,getAllGymListWithDay,getAllGymDetails,getAllDaysWithWorkout } from "../../controller/GymList/GymList.controller.js";
 import express from "express";
 import router from "express";
 
@@ -6,7 +6,7 @@ const gymListRouter = express.Router();
 
 gymListRouter.get("/get-all-workout-with-details", getAllGymList);
 gymListRouter.get("/get-all-details", getAllGymDetails);
-
+gymListRouter.get("/get-all-days-and-workout",getAllDaysWithWorkout);
 gymListRouter.get("/get-all-workout-with-details-days", getAllGymListWithDay);
 
 
