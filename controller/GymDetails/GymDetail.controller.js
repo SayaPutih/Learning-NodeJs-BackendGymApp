@@ -53,18 +53,27 @@ export const editGymDetailById = async (req, res) => {
     const workoutFinder = await model.findAll({
       where: { GymWorkoutId: body.GymWorkoutId },
     });
-    if (workoutFinder.length <= 0)
+    // if (workoutFinder.length <= 0)
+    if(false)
       return res
         .status(404)
-        .json(`Nothing with the workout id of ${GymWorkoutId} masterEvan`);
+        .json(`Nothing with the workout id of ${body.GymWorkoutId} masterEvan`);
 
     tempFinder.kg = body.kg;
     tempFinder.sets = body.sets;
+    tempFinder.reps = body.reps;
     tempFinder.typeWo = body.typeWo;
+    tempFinder.GymWorkoutId = body.GymWorkoutId;
+    tempFinder.updatedAt = new Date(); 
 
     await tempFinder.save();
 
-    return res.status(200).json(await model.findAll());
+    return res.status(200).json({
+      message : 'It is Done',
+      message2 : 'Test Message',
+      message3 : 'Lama Responya Vscode LOLOL',
+      result : (await model.findByPk(id))
+    });
   } catch (err) {
     return res.status(500).json(err.message);
   }
@@ -88,3 +97,17 @@ export const deleteGymDetailBytId = async (req, res) => {
     return res.status(500).json(err.message);
   }
 };
+
+
+export const getGymDetailById = async (req,res)=>{
+  try{
+
+    const id = req.params.id;
+    const tempFinder = await model.findByPk(id);
+    if(tempFinder == null) return res.status(404).json(`Nothing in the database with the id of ${id} master Evan`);
+    return res.status(200).json(tempFinder);
+
+  }catch(err){
+    return res.status(500).json(err.message);
+  }
+}
