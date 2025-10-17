@@ -1,7 +1,9 @@
 import express from "express";
-import GymDetailModel from "../../models/routine/GymDetailModel.js";
-import GymWorkoutDisciplineModel from "../../models/routine/GymWorkoutDisciplineModel.js";
+
 import GymDayDisciplineModel from "../../models/routine/GymDayDisciplineModel.js";
+import GymWorkoutDisciplineModel from "../../models/routine/GymWorkoutDisciplineModel.js";
+import GymDetailModel from "../../models/routine/GymDetailModel.js";
+import GymWorkoutDetailModel from "../../models/routine/GymWorkoutDetailModel.js";
 
 const model = GymDetailModel;
 
@@ -87,7 +89,6 @@ export const getAllGymListWithDay = async (req, res) => {
   }
 };
 
-
 export const getAllGymList = async (req, res) => {
   try {
     const tempFinder = await GymWorkoutDisciplineModel.findAll({
@@ -109,6 +110,60 @@ export const getAllGymList = async (req, res) => {
     });
   }
 };
+
+export const getAllGymWorkoutWithFullDetails = async(req,res)=>{
+  try{
+    const tempFinder = await GymDayDisciplineModel.findAll({
+      include : [{
+        model : GymWorkoutDisciplineModel,
+        as : "ListOfWorkouts",
+          include : [{
+            model : GymWorkoutDetailModel, 
+            as : "gymDetails",
+          },
+          {
+            model : GymDetailModel, 
+            as : "MyWorkoutDetails",
+          }]
+      }]
+    })
+
+    if(tempFinder == null)return res.status(404).json(`Nothing in the database Master Evan`)
+    return res.status(200).json(tempFinder)
+  }catch(err){
+    return res.status(500).json(err.message);
+  }
+}
+
+export const getAllGymWorkoutWithFullDetailsWithId = async(req,res)=>{
+  try{
+    const id = req.params.id;
+    const tempFinder = await GymWorkoutDisciplineModel.findOne({
+      message : "Got Data",
+      where : {id : id},
+      include : [{
+        model : GymDetailModel, 
+        as : "MyWorkoutDetails",
+      },{
+        model : GymWorkoutDetailModel, 
+        as : "gymDetails",
+      },{
+        model : GymDayDisciplineModel, 
+        as : "FromDay",
+      }],
+    })
+
+    if(!tempFinder)return res.status(404).json(`Nothing in the database Master Evan with id of ${id}`)
+    return res.status(200).json(tempFinder)
+
+  }catch(err){
+    return res.status(500).json(err.message);
+  }
+}
+
+
+
+
 
 // * HTML Embeded COde
 // * Vendor Pricing

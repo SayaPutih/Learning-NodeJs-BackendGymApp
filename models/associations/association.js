@@ -4,6 +4,7 @@ import ScheduleDisciplineModel from "../routine/ScheduleDisciplineModel.js";
 import GymDetailModel from "../routine/GymDetailModel.js";
 import GymWorkoutDisciplineModel from "../routine/GymWorkoutDisciplineModel.js";
 import GymDayDisciplineModel from "../routine/GymDayDisciplineModel.js";
+import GymWorkoutDetailModel from "../routine/GymWorkoutDetailModel.js";
 
 ScheduleDisciplineModel.hasMany(CodeDetailModel, {
   foreignKey: "TableId",
@@ -38,6 +39,18 @@ GymDetailModel.belongsTo(GymWorkoutDisciplineModel, {
   as: "WorkoutName",
 });
 
+GymWorkoutDisciplineModel.hasMany(GymWorkoutDetailModel, {
+  foreignKey: "GymWorkoutId",
+  sourceKey: "id",
+  as: "gymDetails",
+  onDelete: "CASCADE",
+});
+GymWorkoutDetailModel.belongsTo(GymWorkoutDisciplineModel, {
+  foreignKey: "GymWorkoutId",
+  targetKey: "id",
+  as: "FromGymWorkout",
+});
+
 GymDayDisciplineModel.hasMany(GymWorkoutDisciplineModel, {
   foreignKey: "GymDayId",
   sourceKey: "id",
@@ -69,4 +82,5 @@ export {
   GymDetailModel,
   GymWorkoutDisciplineModel,
   GymDayDisciplineModel,
+  GymWorkoutDetailModel,
 };

@@ -1,6 +1,7 @@
 import express from "express";
 import mysql from "mysql2";
 import seq from "./config/database.js";
+import "module-alias/register.js";
 
 import cors from "cors";
 const corsOptions = {
@@ -59,7 +60,10 @@ import gymDetailRouter from "./routes/GymDetails/GymDetail.route.js";
 app.use("/api/v3/GymDetail", gymDetailRouter);
 
 import CodeListRouter from "./routes/CodeList/CodeList.route.js";
-app.use("/api/v3/CodeList",CodeListRouter);
+app.use("/api/v3/CodeList", CodeListRouter);
+
+import GymWorkoutDetailRouter from "./routes/GymWorkoutDetails/GymWorkoutDetails.routes.js";
+app.use("/api/v3/GymWorkoutDetails", GymWorkoutDetailRouter);
 
 seq
   .authenticate()
