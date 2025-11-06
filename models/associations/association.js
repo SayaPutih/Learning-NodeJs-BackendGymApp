@@ -39,7 +39,7 @@ GymDetailModel.belongsTo(GymWorkoutDisciplineModel, {
   as: "WorkoutName",
 });
 
-GymWorkoutDisciplineModel.hasMany(GymWorkoutDetailModel, {
+GymWorkoutDisciplineModel.hasOne(GymWorkoutDetailModel, {
   foreignKey: "GymWorkoutId",
   sourceKey: "id",
   as: "gymDetails",

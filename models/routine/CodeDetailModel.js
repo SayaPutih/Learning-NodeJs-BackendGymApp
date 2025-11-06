@@ -10,6 +10,10 @@ const CodeDetailModel = sequ.define(
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
+    stackName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     detail: {
       type: DataTypes.STRING,
       allowNull: false,

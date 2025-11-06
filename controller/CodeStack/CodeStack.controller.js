@@ -6,6 +6,7 @@ import CodeDisciplineModel from "../../models/routine/CodeDisciplineModel.js";
 //check foreign key cascade
 const CodeStack = CodeDisciplineModel;
 
+//Get All 
 export const getAllCodeStack = async (req, res) => {
   try {
     const tempFinder = await CodeStack.findAll();
@@ -21,13 +22,14 @@ export const getAllCodeStack = async (req, res) => {
   }
 };
 
+//by Name
 export const getCodeStackByName = async (req, res) => {
   try {
     const name = req.params.name;
 
     const tempFinder = await CodeStack.findOne({
       where: {
-        stackName: name,
+        ProjectName : name,
       },
     });
 
@@ -48,6 +50,7 @@ export const getCodeStackByName = async (req, res) => {
   }
 };
 
+//Create
 export const createACodeStack = async (req, res) => {
   try {
     const newStack = req.body;
@@ -65,10 +68,11 @@ export const createACodeStack = async (req, res) => {
   }
 };
 
+//Update
 export const updateCodeStackById = async (req, res) => {
   try {
     const idFinder = req.params.idFinder;
-    const { newStackName, newProjectName } = req.body;
+    const { newProjectDetails, newProjectName } = req.body;
     const findStack = await CodeStack.findByPk(idFinder);
 
     if (!findStack)
@@ -76,7 +80,7 @@ export const updateCodeStackById = async (req, res) => {
         .status(404)
         .json(`Nothing With the id of ${idFinder} master Evan`);
 
-    findStack.stackName = newStackName;
+    findStack.ProjectDetails = newProjectDetails;
     findStack.ProjectName = newProjectName;
 
     await findStack.save();
@@ -108,7 +112,7 @@ export const delelteStackById = async (req, res) => {
 
     const sisah = await CodeDisciplineModel.findAll();
     res.status(200).json({
-      message: `Deleted Stack Name : ${deleteTemp.stackName}`,
+      message: `Deleted Stack Name : ${deleteTemp.ProjectName}`,
       remaining: sisah,
     });
   } catch (err) {
@@ -121,7 +125,7 @@ export const insertAStack = async (req, res) => {
     const tempInserter = await CodeDisciplineModel.create(req.body);
     res
       .status(200)
-      .json(`Created new Code Master Evan : ${tempInserter.stackName}`);
+      .json(`Created new Code Master Evan : ${tempInserter.ProjectName}`);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

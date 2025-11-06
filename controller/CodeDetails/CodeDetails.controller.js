@@ -7,6 +7,7 @@ import CodeDisciplineModel from "../../models/routine/CodeDisciplineModel.js";
 //../../../models/routines/CodeDetailModel.js"
 const model = CodeDetailModel;
 
+//Get All
 export const getAllCodeDetails = async (req, res) => {
   try {
     const tempFinder = await model.findAll();
@@ -18,6 +19,7 @@ export const getAllCodeDetails = async (req, res) => {
   }
 };
 
+//by projectId(codeId)
 export const getCodeDetailsById = async (req, res) => {
   try {
     const idFinder = req.params.id;
@@ -32,6 +34,7 @@ export const getCodeDetailsById = async (req, res) => {
   }
 };
 
+//Insert a Code Details
 export const insertACodeDetails= async (req, res) => {
   try {
     const tempInserter = req.body;
@@ -56,7 +59,7 @@ export const insertACodeDetails= async (req, res) => {
     res
       .status(200)
       .json(
-        `Created new Detail for ${codeStackExists.stackName} -> ${inserter.detail}`
+        `Created new Work Info for ${codeStackExists.ProjectName} -> ${inserter.detail}`
       );
   } catch (err) {
     res.status(500).json({ message: err.message });

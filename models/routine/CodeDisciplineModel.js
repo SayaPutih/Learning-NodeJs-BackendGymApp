@@ -10,11 +10,11 @@ const CodeDisciplineModel = sequ.define(
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
     },
-    stackName: {
+    ProjectName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    ProjectName: {
+    ProjectDetails: {
       type: DataTypes.STRING,
       allowNull: false,
     },
