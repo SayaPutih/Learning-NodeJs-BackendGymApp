@@ -1,11 +1,24 @@
 import GymWorkoutDisciplineModel from "../../models/routine/GymWorkoutDisciplineModel.js";
 import GymDayDisciplineModel from "../../models/routine/GymDayDisciplineModel.js";
+import gymDetails from "../../models/routine/GymWorkoutDetailModel.js";
+import GymDetailModel from "../../models/routine/GymDetailModel.js";
+
 const WorkoutModel = GymWorkoutDisciplineModel;
 const GymDayModel = GymDayDisciplineModel;
+const FromDay = GymDayDisciplineModel;
+const MyWorkoutDetails = GymDetailModel;
 
 export const getAllWorkouts = async (req, res) => {
   try {
-    const tempFinder = await WorkoutModel.findAll();
+    const tempFinder = await WorkoutModel.findAll({
+      include: [
+        { model: gymDetails, as: "gymDetails" },
+        { model: FromDay, as: "FromDay" },
+        { model: MyWorkoutDetails, as: "MyWorkoutDetails" },
+      ],
+      total: MyWorkoutDetails.length,
+      order: [["updatedAt", "DESC"]],
+    });
     if (tempFinder < 1)
       return res.status(404).json(`Nothing in the Database Master Evan`);
     return res.status(200).json(tempFinder);

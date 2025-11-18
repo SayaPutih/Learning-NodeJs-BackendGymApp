@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "../images")); // simpan ke /ScheduleEvanderDiscipline/images
   },
   filename: (req, file, cb) => {
-    cb(null,Date.now()+ path.extname(file.originalname));
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 

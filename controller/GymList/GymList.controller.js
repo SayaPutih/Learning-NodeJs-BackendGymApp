@@ -7,74 +7,71 @@ import GymWorkoutDetailModel from "../../models/routine/GymWorkoutDetailModel.js
 
 const model = GymDetailModel;
 
-export const getAllDaysWithWorkout = async(req,res)=>{
-  try{
-
+export const getAllDaysWithWorkout = async (req, res) => {
+  try {
     const tempFinder = await GymDayDisciplineModel.findAll({
-      include : [
+      include: [
         {
-          model : GymWorkoutDisciplineModel,
-          as : "ListOfWorkouts"
-        }
-      ]
+          model: GymWorkoutDisciplineModel,
+          as: "ListOfWorkouts",
+        },
+      ],
+      order: [["updatedAt", "DESC"]],
     });
 
-    if(!tempFinder || tempFinder === 0)return res.status(404).json("Master Evan Somthing wrong with Fetching all Days");
+    if (!tempFinder || tempFinder === 0)
+      return res
+        .status(404)
+        .json("Master Evan Somthing wrong with Fetching all Days");
     return res.status(200).json(tempFinder);
-
-  }catch(err){
+  } catch (err) {
     return res.status(500).json(err.message);
   }
-}
+};
 
-export const getAllGymDetails = async(req,res)=>{
-  try{
-
+export const getAllGymDetails = async (req, res) => {
+  try {
     const tempFinder = await model.findAll({
-      include : [
+      include: [
         {
-          model : GymWorkoutDisciplineModel,
-          as : "WorkoutName",
-          include : [
+          model: GymWorkoutDisciplineModel,
+          as: "WorkoutName",
+          include: [
             {
-              model : GymDayDisciplineModel,
-              as : "FromDay",
-            }
-          ]
-        }
-      ]
-    })
+              model: GymDayDisciplineModel,
+              as: "FromDay",
+            },
+          ],
+        },
+      ],
+    });
 
-    if(tempFinder > 0) return res.status(404).json("Nothing in the Database Master Evan");
+    if (tempFinder > 0)
+      return res.status(404).json("Nothing in the Database Master Evan");
     return res.status(200).json({
-      total : tempFinder.length,
-      data : tempFinder
-    })
-
-  }catch(err){
+      total: tempFinder.length,
+      data: tempFinder,
+    });
+  } catch (err) {
     return res.status(500).json(err.message);
   }
-}
+};
 
 export const getAllGymListWithDay = async (req, res) => {
   try {
     const tempFinder = await GymDayDisciplineModel.findAll({
       include: [
-
         {
-
           model: GymWorkoutDisciplineModel,
           as: "ListOfWorkouts",
 
-            include : [
-                {
-                  model: GymDetailModel,
-                  as: "MyWorkoutDetails",
-                } 
-            ],
-
+          include: [
+            {
+              model: GymDetailModel,
+              as: "MyWorkoutDetails",
+            },
+          ],
         },
-
       ],
     });
 
@@ -111,59 +108,66 @@ export const getAllGymList = async (req, res) => {
   }
 };
 
-export const getAllGymWorkoutWithFullDetails = async(req,res)=>{
-  try{
+export const getAllGymWorkoutWithFullDetails = async (req, res) => {
+  try {
     const tempFinder = await GymDayDisciplineModel.findAll({
-      include : [{
-        model : GymWorkoutDisciplineModel,
-        as : "ListOfWorkouts",
-          include : [{
-            model : GymWorkoutDetailModel, 
-            as : "gymDetails",
-          },
-          {
-            model : GymDetailModel, 
-            as : "MyWorkoutDetails",
-          }]
-      }]
-    })
+      include: [
+        {
+          model: GymWorkoutDisciplineModel,
+          as: "ListOfWorkouts",
+          include: [
+            {
+              model: GymWorkoutDetailModel,
+              as: "gymDetails",
+            },
+            {
+              model: GymDetailModel,
+              as: "MyWorkoutDetails",
+            },
+          ],
+        },
+      ],
+    });
 
-    if(tempFinder == null)return res.status(404).json(`Nothing in the database Master Evan`)
-    return res.status(200).json(tempFinder)
-  }catch(err){
+    if (tempFinder == null)
+      return res.status(404).json(`Nothing in the database Master Evan`);
+    return res.status(200).json(tempFinder);
+  } catch (err) {
     return res.status(500).json(err.message);
   }
-}
+};
 
-export const getAllGymWorkoutWithFullDetailsWithId = async(req,res)=>{
-  try{
+export const getAllGymWorkoutWithFullDetailsWithId = async (req, res) => {
+  try {
     const id = req.params.id;
     const tempFinder = await GymWorkoutDisciplineModel.findOne({
-      message : "Got Data",
-      where : {id : id},
-      include : [{
-        model : GymDetailModel, 
-        as : "MyWorkoutDetails",
-      },{
-        model : GymWorkoutDetailModel, 
-        as : "gymDetails",
-      },{
-        model : GymDayDisciplineModel, 
-        as : "FromDay",
-      }],
-    })
+      message: "Got Data",
+      where: { id: id },
+      include: [
+        {
+          model: GymDetailModel,
+          as: "MyWorkoutDetails",
+        },
+        {
+          model: GymWorkoutDetailModel,
+          as: "gymDetails",
+        },
+        {
+          model: GymDayDisciplineModel,
+          as: "FromDay",
+        },
+      ],
+    });
 
-    if(!tempFinder)return res.status(404).json(`Nothing in the database Master Evan with id of ${id}`)
-    return res.status(200).json(tempFinder)
-
-  }catch(err){
+    if (!tempFinder)
+      return res
+        .status(404)
+        .json(`Nothing in the database Master Evan with id of ${id}`);
+    return res.status(200).json(tempFinder);
+  } catch (err) {
     return res.status(500).json(err.message);
   }
-}
-
-
-
-
+};
 
 // * HTML Embeded COde
 // * Vendor Pricing

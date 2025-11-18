@@ -3,10 +3,16 @@ import GymWorkoutDiscipline from "../../models/routine/GymWorkoutDisciplineModel
 
 const model = GymDetailModel;
 
+//const maxWorkout = await model.findMax(kg);
+
 export const getGymDetailByWorkoutId = async (req, res) => {
   try {
     const gymWorkoutId = req.params.id;
     const tempFinder = await model.findAll({
+      where: { gymWorkoutId: gymWorkoutId },
+    });
+
+    const maxKg = await model.max("Kg", {
       where: { gymWorkoutId: gymWorkoutId },
     });
 
@@ -15,7 +21,10 @@ export const getGymDetailByWorkoutId = async (req, res) => {
         .status(404)
         .json(`Nothing in the Database with id ${gymWorkoutId} master Evan`);
 
-    return res.status(200).json(tempFinder);
+    return res.status(200).json({
+      result: tempFinder,
+      maxKgDb: maxKg,
+    });
   } catch (err) {
     return res.status(500).json(err.message);
   }
@@ -54,7 +63,7 @@ export const editGymDetailById = async (req, res) => {
       where: { GymWorkoutId: body.GymWorkoutId },
     });
     // if (workoutFinder.length <= 0)
-    if(false)
+    if (false)
       return res
         .status(404)
         .json(`Nothing with the workout id of ${body.GymWorkoutId} masterEvan`);
@@ -64,15 +73,15 @@ export const editGymDetailById = async (req, res) => {
     tempFinder.reps = body.reps;
     tempFinder.typeWo = body.typeWo;
     tempFinder.GymWorkoutId = body.GymWorkoutId;
-    tempFinder.updatedAt = new Date(); 
+    tempFinder.updatedAt = new Date();
 
     await tempFinder.save();
 
     return res.status(200).json({
-      message : 'It is Done',
-      message2 : 'Test Message',
-      message3 : 'Lama Responya Vscode LOLOL',
-      result : (await model.findByPk(id))
+      message: "It is Done",
+      message2: "Test Message",
+      message3: "Lama Responya Vscode LOLOL",
+      result: await model.findByPk(id),
     });
   } catch (err) {
     return res.status(500).json(err.message);
@@ -98,16 +107,16 @@ export const deleteGymDetailBytId = async (req, res) => {
   }
 };
 
-
-export const getGymDetailById = async (req,res)=>{
-  try{
-
+export const getGymDetailById = async (req, res) => {
+  try {
     const id = req.params.id;
     const tempFinder = await model.findByPk(id);
-    if(tempFinder == null) return res.status(404).json(`Nothing in the database with the id of ${id} master Evan`);
+    if (tempFinder == null)
+      return res
+        .status(404)
+        .json(`Nothing in the database with the id of ${id} master Evan`);
     return res.status(200).json(tempFinder);
-
-  }catch(err){
+  } catch (err) {
     return res.status(500).json(err.message);
   }
-}
+};

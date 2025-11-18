@@ -66,11 +66,12 @@ export const insertACodeDetails= async (req, res) => {
   }
 };
 
+//Update Code Details
 export const updateCodeDetailById = async (req, res) => {
   try {
     const idFinder = await req.params.id;
 
-    const { detail, CodeId, ScheId } = await req.body;
+    const { stack,detail, CodeId, ScheId } = await req.body;
 
     const tempFinder = await model.findOne({ where: { id: idFinder } });
 
@@ -79,6 +80,7 @@ export const updateCodeDetailById = async (req, res) => {
         .status(404)
         .json("Nothing in the database Master Evan with the id of " + idFinder);
 
+    tempFinder.stackName = stack;
     tempFinder.detail = detail;
     tempFinder.CodeId = CodeId;
     tempFinder.TableId = ScheId;
