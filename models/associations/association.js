@@ -5,6 +5,12 @@ import GymDetailModel from "../routine/GymDetailModel.js";
 import GymWorkoutDisciplineModel from "../routine/GymWorkoutDisciplineModel.js";
 import GymDayDisciplineModel from "../routine/GymDayDisciplineModel.js";
 import GymWorkoutDetailModel from "../routine/GymWorkoutDetailModel.js";
+import ScheduleGymPlanModel from "../routine/ScheduleGymPlanModel.js";
+
+ScheduleGymPlanModel.belongsTo(GymWorkoutDisciplineModel, {
+  foreignKey: "WorkoutId",
+  as: "Workout",
+});
 
 ScheduleDisciplineModel.hasMany(CodeDetailModel, {
   foreignKey: "TableId",
