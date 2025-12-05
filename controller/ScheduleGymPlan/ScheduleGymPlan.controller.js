@@ -1,9 +1,23 @@
 import ScheduleGymPlanModel from "../../models/routine/ScheduleGymPlanModel.js";
 import GymWorkoutDisciplineModel from "../../models/routine/GymWorkoutDisciplineModel.js";
+import { Op } from "sequelize";
 
 export const getAllScheduleGymPlan = async (req, res) => {
   try {
+    const { date } = req.query;
+    const whereCondition = {};
+
+    if (date) {
+      const start = new Date(date + "T00:00:00.000Z");
+      const end = new Date(date + "T23:59:59.999Z");
+
+      whereCondition.timeSet = {
+        [Op.between]: [start, end],
+      };
+    }
+
     const tempFinder = await ScheduleGymPlanModel.findAll({
+      where: whereCondition,
       include: [
         {
           model: GymWorkoutDisciplineModel,
@@ -11,10 +25,11 @@ export const getAllScheduleGymPlan = async (req, res) => {
           attributes: ["workoutName", "id", "workoutPicture"],
         },
       ],
+      order: [["timeSet", "ASC"]],
     });
 
-    if (tempFinder.length === 0)
-      return res.status(404).json("Nothing in the database Master Evan");
+    // if (tempFinder.length === 0)
+    //   return res.status(404).json("Nothing in the database Master Evan");
 
     return res.status(200).json(tempFinder);
   } catch (err) {
@@ -31,7 +46,7 @@ export const insertGymPlan = async (req, res) => {
       where: { id: body.WorkoutId },
     });
     if (!check)
-      return res.status(404).json("Nothing with the wokrout id of Master Evan");
+      return res.status(404).json("Nothing with the workout id of Master Evan");
 
     await ScheduleGymPlanModel.create({ ...body });
     return res.status(200).json("Successfull Insert");
@@ -67,5 +82,19 @@ export const updateGymPlan = async (req, res) => {
     return res.status(200).json("Succesfully updated");
   } catch (err) {
     return res.status(500).json("Eror Master Evan : " + err);
+  }
+};
+
+export const deleteGymPlanById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const tempFinder = await ScheduleGymPlanModel.findByPk(id);
+    if (!tempFinder)
+      return res.status(404).json("Nothing with the id of : ", id);
+
+    await tempFinder.destroy();
+    return res.status(200).json("Succesfully deleted : ", id);
+  } catch (err) {
+    return res.status(500).json("Error Json : " + err);
   }
 };
