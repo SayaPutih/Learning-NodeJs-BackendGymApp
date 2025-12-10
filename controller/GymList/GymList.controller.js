@@ -59,6 +59,9 @@ export const getAllGymDetails = async (req, res) => {
 
 export const getAllGymListWithDay = async (req, res) => {
   try {
+    // const limit = req.query.limit;
+    // const page = req.query.page;
+
     const tempFinder = await GymDayDisciplineModel.findAll({
       include: [
         {
@@ -157,6 +160,13 @@ export const getAllGymWorkoutWithFullDetailsWithId = async (req, res) => {
           as: "FromDay",
         },
       ],
+      order: [
+        [
+          { model: GymDetailModel, as: "MyWorkoutDetails" },
+          "workoutDate",
+          "ASC",
+        ],
+      ],
     });
 
     if (!tempFinder)
@@ -164,6 +174,72 @@ export const getAllGymWorkoutWithFullDetailsWithId = async (req, res) => {
         .status(404)
         .json(`Nothing in the database Master Evan with id of ${id}`);
     return res.status(200).json(tempFinder);
+  } catch (err) {
+    return res.status(500).json(err.message);
+  }
+};
+
+export const getAllGymWorkoutWithFullDetailsWithIdPagination = async (
+  req,
+  res
+) => {
+  try {
+    const id = req.params.id;
+
+    //perpage 10
+
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const start = (page - 1) * limit;
+    const end = page * limit;
+
+    const totalCount = await GymDetailModel.count({
+      where: { GymWorkoutId: id },
+    });
+
+    const tempFinder = await GymWorkoutDisciplineModel.findOne({
+      message: "Got Data",
+      where: { id: id },
+      include: [
+        {
+          model: GymDetailModel,
+          as: "MyWorkoutDetails",
+          limit: limit,
+          offset: start,
+          order: [["workoutDate", "ASC"]],
+          separate: true,
+        },
+        {
+          model: GymWorkoutDetailModel,
+          as: "gymDetails",
+        },
+        {
+          model: GymDayDisciplineModel,
+          as: "FromDay",
+        },
+      ],
+    });
+
+    //const paginationDetail = tempFinder.MyWorkoutDetails.slice(start, end);
+
+    if (!tempFinder)
+      return res
+        .status(404)
+        .json(`Nothing in the database Master Evan with id of ${id}`);
+    // return res.status(200).json({
+    //   result: tempFinder,
+    //   pagination: paginationDetail,
+    // });
+    return res.status(200).json({
+      data: tempFinder,
+      pagination: {
+        totalItems: totalCount,
+        currentPage: page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    });
   } catch (err) {
     return res.status(500).json(err.message);
   }
