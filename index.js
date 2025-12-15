@@ -70,6 +70,9 @@ app.use("/api/v3/GymWorkoutDetails", GymWorkoutDetailRouter);
 import ScheduleGymPlanRoute from "./routes/ScheduleGymPlan/ScheduleGymPlan.route.js";
 app.use("/api/v3/ScheduleGymPlan", ScheduleGymPlanRoute);
 
+import StatisticsGymRoute from "./routes/StatisticsGym/StatisticsGym.route.js";
+app.use("/api/v3/StatisticsGym", StatisticsGymRoute);
+
 seq
   .authenticate()
   .then(() => {
