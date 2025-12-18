@@ -1,9 +1,89 @@
 import GymDetailModel from "../../models/routine/GymDetailModel.js";
 import GymWorkoutDiscipline from "../../models/routine/GymWorkoutDisciplineModel.js";
+import GymWorkoutDetailModel from "../../models/routine/GymWorkoutDetailModel.js";
 
 const model = GymDetailModel;
 
 //const maxWorkout = await model.findMax(kg);
+
+export const getWorkoutDetailsWithWorkoutName = async (req,res)=>{
+  try{
+
+    //const {page,limit} = req.params;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const start = (page - 1) * limit;
+    const end = page * limit;
+
+    //const total = await GymDetailModel.count();
+
+    const {count,rows} = await GymDetailModel.findAndCountAll({
+      include : [
+        {
+          model : GymWorkoutDiscipline,
+          as : "WorkoutName",
+          include : [
+            {
+              model : GymWorkoutDetailModel,
+              as : "gymDetails",
+            }
+          ]
+        },
+      ],
+      limit : limit,
+      offset : start,
+      order : [['workoutDate','DESC']],
+    });
+
+    const response = rows.map((a)=>({
+        id: a.id,
+        kg: a.kg,
+        reps: a.reps,
+        sets: a.sets,
+        typeWo: a.typeWo,
+        workoutDate: a.workoutDate,
+        TableId: a.TableId,
+        GymWorkoutId: a.GymWorkoutId,
+        //createdAt: a.createdAt,
+        updatedAt: a.updatedAt,
+
+        WorkoutNameId: a.WorkoutName?.id ?? null,
+        WorkoutNameWorkoutPicture: a.WorkoutName?.workoutPicture ?? null,
+        WorkoutNameWorkoutName: a.WorkoutName?.workoutName ?? null,
+        WorkoutNameGymDayId: a.WorkoutName?.GymDayId ?? null,
+        //WorkoutNameCreatedAt: a.WorkoutName?.createdAt ?? null,
+        //WorkoutNameUpdatedAt: a.WorkoutName?.updatedAt ?? null,
+
+        WorkoutNameDetailsId: a.WorkoutName?.gymDetails?.id ?? null,
+        //WorkoutNameDetailsGymWorkoutId: a.WorkoutName?.gymDetails?.GymWorkoutId ?? null,
+        WorkoutNameDetailsIsCompoundExcersise: a.WorkoutName?.gymDetails?.isCompoundExcersise ?? null,
+        WorkoutNameDetailsMuscleTargeted: a.WorkoutName?.gymDetails?.muscleTargeted ?? null,
+        WorkoutNameDetailsMinutes: a.WorkoutName?.gymDetails?.minutes ?? null,
+        WorkoutNameDetailsMax: a.WorkoutName?.gymDetails?.max ?? null,
+        //WorkoutNameDetailsCreatedAt: a.WorkoutName.gymDetails?.createdAt ?? null,
+        //WorkoutNameDetailsUpdatedAt: a.WorkoutName.gymDetails?.updatedAt ?? null
+    }))
+
+    const totalCurrent = rows.length;
+    const startFrom = start;
+    const endTo = start + rows.length;
+
+    return res.status(200).json({
+      totalData : count,
+      totalCurrent : totalCurrent,
+      start : startFrom,
+      end : endTo,
+      result : response,
+    });
+
+  }catch(err){
+    return res.status(500).json({message : err});
+  }
+}
+
+
 
 export const getGymDetailByWorkoutId = async (req, res) => {
   try {

@@ -6,6 +6,7 @@ import {
   editGymDetailById,
   deleteGymDetailBytId,
   getGymDetailById,
+  getWorkoutDetailsWithWorkoutName,
 } from "../../controller/GymDetails/GymDetail.controller.js";
 
 const GymDetailRouter = express.Router();
@@ -21,5 +22,7 @@ GymDetailRouter.post(
 );
 GymDetailRouter.put("/edit-by-id-gymdetail/:id", editGymDetailById);
 GymDetailRouter.delete("/delete-by-id-gymdetail/:id", deleteGymDetailBytId);
+
+GymDetailRouter.get("/GymWorkout-GymDetails",getWorkoutDetailsWithWorkoutName);
 
 export default GymDetailRouter;
