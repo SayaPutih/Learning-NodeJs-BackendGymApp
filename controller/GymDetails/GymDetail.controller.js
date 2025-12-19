@@ -1,6 +1,7 @@
 import GymDetailModel from "../../models/routine/GymDetailModel.js";
 import GymWorkoutDiscipline from "../../models/routine/GymWorkoutDisciplineModel.js";
 import GymWorkoutDetailModel from "../../models/routine/GymWorkoutDetailModel.js";
+import { Op } from "sequelize";
 
 const model = GymDetailModel;
 
@@ -13,17 +14,23 @@ export const getWorkoutDetailsWithWorkoutName = async (req,res)=>{
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const name = req.query.name || null;
 
     const start = (page - 1) * limit;
     const end = page * limit;
 
     //const total = await GymDetailModel.count();
 
-    const {count,rows} = await GymDetailModel.findAndCountAll({
+    const {count,rows} = await GymDetailModel.findAndCountAll(
+    {
       include : [
         {
           model : GymWorkoutDiscipline,
           as : "WorkoutName",
+          where : name ? 
+          {
+             workoutName : { [Op.like] : `%${name}%` }
+          } : undefined,
           include : [
             {
               model : GymWorkoutDetailModel,
