@@ -1,96 +1,195 @@
 import GymDetailModel from "../../models/routine/GymDetailModel.js";
 import GymWorkoutDiscipline from "../../models/routine/GymWorkoutDisciplineModel.js";
 import GymWorkoutDetailModel from "../../models/routine/GymWorkoutDetailModel.js";
+import GymDayDisciplineModel from "../../models/routine/GymDayDisciplineModel.js";
 import { Op } from "sequelize";
 
 const model = GymDetailModel;
 
 //const maxWorkout = await model.findMax(kg);
 
-export const getWorkoutDetailsWithWorkoutName = async (req,res)=>{
-  try{
-
+export const getWorkoutDetailsWithWorkoutName = async (req, res) => {
+  try {
     //const {page,limit} = req.params;
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const name = req.query.name || null;
 
+    const muscleName = req.query.muscleName || null;
+    const dayId = req.query.dayId || null;
+
+    const searchDateFrom = req.query.searchDateFrom?.trim() || null;
+    const searchDateTo = req.query.searchDateTo?.trim() || null;
+
     const start = (page - 1) * limit;
     const end = page * limit;
 
     //const total = await GymDetailModel.count();
 
-    const {count,rows} = await GymDetailModel.findAndCountAll(
-    {
-      include : [
+    const dateWhere = {};
+
+    if (searchDateFrom && searchDateTo) {
+      dateWhere.workoutDate = { [Op.between]: [searchDateFrom, searchDateTo] };
+    } else if (searchDateFrom) {
+      dateWhere.workoutDate = { [Op.gte]: searchDateFrom };
+    } else if (searchDateTo) {
+      dateWhere.workoutDate = { [Op.lte]: searchDateTo };
+    }
+
+    const { count, rows } = await GymDetailModel.findAndCountAll({
+      where: dateWhere,
+      include: [
         {
-          model : GymWorkoutDiscipline,
-          as : "WorkoutName",
-          where : name ? 
-          {
-             workoutName : { [Op.like] : `%${name}%` }
-          } : undefined,
-          include : [
+          model: GymWorkoutDiscipline,
+          as: "WorkoutName",
+          required:
+            !!muscleName ||
+            !!name ||
+            !!dayId ||
+            !!searchDateFrom ||
+            !!searchDateTo,
+          where:
+            name || dayId
+              ? {
+                  [Op.and]: [
+                    name
+                      ? { workoutName: { [Op.like]: `%${name}%` } }
+                      : undefined,
+                    dayId ? { GymDayId: dayId } : undefined,
+                  ].filter(Boolean),
+                }
+              : undefined,
+          include: [
             {
-              model : GymWorkoutDetailModel,
-              as : "gymDetails",
-            }
-          ]
+              model: GymWorkoutDetailModel,
+              as: "gymDetails",
+              required: !!muscleName,
+              where: muscleName
+                ? { muscleTargeted: { [Op.like]: `%${muscleName}%` } }
+                : undefined,
+            },
+          ],
         },
       ],
-      limit : limit,
-      offset : start,
-      order : [['workoutDate','DESC']],
+      limit: limit,
+      offset: start,
+      order: [["workoutDate", "DESC"]],
     });
 
-    const response = rows.map((a)=>({
-        id: a.id,
-        kg: a.kg,
-        reps: a.reps,
-        sets: a.sets,
-        typeWo: a.typeWo,
-        workoutDate: a.workoutDate,
-        TableId: a.TableId,
-        GymWorkoutId: a.GymWorkoutId,
-        //createdAt: a.createdAt,
-        updatedAt: a.updatedAt,
+    const response = rows.map((a) => ({
+      id: a.id,
+      kg: a.kg,
+      reps: a.reps,
+      sets: a.sets,
+      typeWo: a.typeWo,
+      workoutDate: a.workoutDate,
+      TableId: a.TableId,
+      GymWorkoutId: a.GymWorkoutId,
+      //createdAt: a.createdAt,
+      updatedAt: a.updatedAt,
 
-        WorkoutNameId: a.WorkoutName?.id ?? null,
-        WorkoutNameWorkoutPicture: a.WorkoutName?.workoutPicture ?? null,
-        WorkoutNameWorkoutName: a.WorkoutName?.workoutName ?? null,
-        WorkoutNameGymDayId: a.WorkoutName?.GymDayId ?? null,
-        //WorkoutNameCreatedAt: a.WorkoutName?.createdAt ?? null,
-        //WorkoutNameUpdatedAt: a.WorkoutName?.updatedAt ?? null,
+      WorkoutNameId: a.WorkoutName?.id ?? null,
+      WorkoutNameWorkoutPicture: a.WorkoutName?.workoutPicture ?? null,
+      WorkoutNameWorkoutName: a.WorkoutName?.workoutName ?? null,
+      WorkoutNameGymDayId: a.WorkoutName?.GymDayId ?? null,
+      //WorkoutNameCreatedAt: a.WorkoutName?.createdAt ?? null,
+      //WorkoutNameUpdatedAt: a.WorkoutName?.updatedAt ?? null,
 
-        WorkoutNameDetailsId: a.WorkoutName?.gymDetails?.id ?? null,
-        //WorkoutNameDetailsGymWorkoutId: a.WorkoutName?.gymDetails?.GymWorkoutId ?? null,
-        WorkoutNameDetailsIsCompoundExcersise: a.WorkoutName?.gymDetails?.isCompoundExcersise ?? null,
-        WorkoutNameDetailsMuscleTargeted: a.WorkoutName?.gymDetails?.muscleTargeted ?? null,
-        WorkoutNameDetailsMinutes: a.WorkoutName?.gymDetails?.minutes ?? null,
-        WorkoutNameDetailsMax: a.WorkoutName?.gymDetails?.max ?? null,
-        //WorkoutNameDetailsCreatedAt: a.WorkoutName.gymDetails?.createdAt ?? null,
-        //WorkoutNameDetailsUpdatedAt: a.WorkoutName.gymDetails?.updatedAt ?? null
-    }))
+      WorkoutNameDetailsId: a.WorkoutName?.gymDetails?.id ?? null,
+      //WorkoutNameDetailsGymWorkoutId: a.WorkoutName?.gymDetails?.GymWorkoutId ?? null,
+      WorkoutNameDetailsIsCompoundExcersise:
+        a.WorkoutName?.gymDetails?.isCompoundExcersise ?? null,
+      WorkoutNameDetailsMuscleTargeted:
+        a.WorkoutName?.gymDetails?.muscleTargeted ?? null,
+      WorkoutNameDetailsMinutes: a.WorkoutName?.gymDetails?.minutes ?? null,
+      WorkoutNameDetailsMax: a.WorkoutName?.gymDetails?.max ?? null,
+      //WorkoutNameDetailsCreatedAt: a.WorkoutName.gymDetails?.createdAt ?? null,
+      //WorkoutNameDetailsUpdatedAt: a.WorkoutName.gymDetails?.updatedAt ?? null
+    }));
 
     const totalCurrent = rows.length;
     const startFrom = start;
     const endTo = start + rows.length;
 
     return res.status(200).json({
-      totalData : count,
-      totalCurrent : totalCurrent,
-      start : startFrom,
-      end : endTo,
-      result : response,
+      totalData: count,
+      totalCurrent: totalCurrent,
+      start: startFrom,
+      end: endTo,
+      result: response,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err });
+  }
+};
+
+export const getAllDistinctSearches = async (req, res) => {
+  try {
+    const distinctMuscleTargeted = await GymWorkoutDetailModel.findAll({
+      attributes: ["muscleTargeted"],
+      where: {
+        muscleTargeted: {
+          [Op.ne]: null,
+        },
+      },
+      group: ["muscleTargeted"],
+      raw: true,
     });
 
-  }catch(err){
-    return res.status(500).json({message : err});
+    const gymDays = await GymDayDisciplineModel.findAll({
+      attributes: ["name", "id"],
+    });
+
+    return res.status(200).json({
+      muscleTargeted: distinctMuscleTargeted.map((a) => a.muscleTargeted),
+      gymDays: gymDays,
+    });
+
+    // const result = await GymDetailModel.findAll({
+    //   include: [
+    //     {
+    //       model: GymWorkoutDiscipline,
+    //       as: "WorkoutName",
+    //       include: [
+    //         {
+    //           model: GymWorkoutDetailModel,
+    //           as: "gymDetails",
+    //         },
+    //       ],
+    //     },
+    //   ],
+    //   order: [["workoutDate", "DESC"]],
+    // });
+    // const sorted = result.map((a) => ({
+    //   id: a.id,
+    //   kg: a.kg,
+    //   reps: a.reps,
+    //   sets: a.sets,
+    //   typeWo: a.typeWo,
+    //   workoutDate: a.workoutDate,
+    //   TableId: a.TableId,
+    //   GymWorkoutId: a.GymWorkoutId,
+    //   updatedAt: a.updatedAt,
+    //   WorkoutNameId: a.WorkoutName?.id ?? null,
+    //   WorkoutNameWorkoutPicture: a.WorkoutName?.workoutPicture ?? null,
+    //   WorkoutNameWorkoutName: a.WorkoutName?.workoutName ?? null,
+    //   WorkoutNameGymDayId: a.WorkoutName?.GymDayId ?? null,
+    //   WorkoutNameDetailsId: a.WorkoutName?.gymDetails?.id ?? null,
+    //   WorkoutNameDetailsIsCompoundExcersise:
+    //     a.WorkoutName?.gymDetails?.isCompoundExcersise ?? null,
+    //   WorkoutNameDetailsMuscleTargeted:
+    //     a.WorkoutName?.gymDetails?.muscleTargeted ?? null,
+    //   WorkoutNameDetailsMinutes: a.WorkoutName?.gymDetails?.minutes ?? null,
+    //   WorkoutNameDetailsMax: a.WorkoutName?.gymDetails?.max ?? null,
+    // }));
+    // const distinctMuscleTargeted = sorted.map(
+    //   (a) => a.WorkoutNameDetailsMuscleTargeted
+    // );
+  } catch (err) {
+    return res.status(500).json({ message: err });
   }
-}
-
-
+};
 
 export const getGymDetailByWorkoutId = async (req, res) => {
   try {

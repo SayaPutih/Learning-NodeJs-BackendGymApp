@@ -119,7 +119,11 @@ export const DeleteWorkoutById = async (req, res) => {
     if (tempFinder == null)
       return res.status(404).json(`Nothing with that id MasterEvan`);
 
-    await tempFinder.destroy();
+    // await gymDetails.destroy({
+    //   where: { workoutId: req.params.id },
+    // });
+
+    await tempFinder.destroy({ force: true });
     const sisahFinder = await WorkoutModel.findAll();
     return res.status(200).json({
       message: `Succesfully Deleted ${tempFinder.workoutName}`,
@@ -127,6 +131,12 @@ export const DeleteWorkoutById = async (req, res) => {
       database: sisahFinder,
     });
   } catch (err) {
-    return res.status(200).json(err.message);
+    console.error("DELETE ERROR FULL:", err);
+    console.error("PARENT:", err.parent);
+    return res.status(500).json({
+      name: err.name,
+      message: err.message,
+      parent: err.parent,
+    });
   }
 };
