@@ -77,7 +77,7 @@ seq
   .authenticate()
   .then(() => {
     console.log("Connected To the Database Master Evan");
-    return seq.sync({ alter: true }); //Creates A Table When It doesnt Exist
+    return seq.sync({ alter: false }); //Creates A Table When It doesnt Exist
   })
   .then(() => {
     console.log("Tables Synced.");
