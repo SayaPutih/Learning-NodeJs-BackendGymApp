@@ -14,10 +14,10 @@ export const getWorkoutDetailsWithWorkoutName = async (req, res) => {
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const name = req.query.name || null;
+    const name = req.query.name?.trim() || null;
 
-    const muscleName = req.query.muscleName || null;
-    const dayId = req.query.dayId || null;
+    const muscleName = req.query.muscleName?.trim() || null;
+    const dayId = req.query.dayId?.trim() || null;
 
     const searchDateFrom = req.query.searchDateFrom?.trim() || null;
     const searchDateTo = req.query.searchDateTo?.trim() || null;
