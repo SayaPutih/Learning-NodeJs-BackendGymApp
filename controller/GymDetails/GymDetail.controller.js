@@ -77,11 +77,13 @@ export const getWorkoutDetailsWithWorkoutName = async (req, res) => {
       order: [["workoutDate", "DESC"]],
     });
 
+    //UPDATE gymdetails SET reps = sets, sets = reps;
+
     const response = rows.map((a) => ({
       id: a.id,
       kg: a.kg,
-      reps: a.reps,
-      sets: a.sets,
+      reps: a.sets,
+      sets: a.reps,
       typeWo: a.typeWo,
       workoutDate: a.workoutDate,
       TableId: a.TableId,

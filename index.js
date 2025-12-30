@@ -73,6 +73,9 @@ app.use("/api/v3/ScheduleGymPlan", ScheduleGymPlanRoute);
 import StatisticsGymRoute from "./routes/StatisticsGym/StatisticsGym.route.js";
 app.use("/api/v3/StatisticsGym", StatisticsGymRoute);
 
+import OpLearnRouter from "./routes/OpLearn/OpLearn.route.js";
+app.use("/api/v4/OpLearn", OpLearnRouter);
+
 seq
   .authenticate()
   .then(() => {
