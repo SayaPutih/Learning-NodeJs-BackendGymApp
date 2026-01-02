@@ -14,6 +14,10 @@ const GymWorkoutDisciplineModel = sequ.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    workoutPictureGif: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     workoutName: {
       type: DataTypes.STRING,
       allowNull: false,
